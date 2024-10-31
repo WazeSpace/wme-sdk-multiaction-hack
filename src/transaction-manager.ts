@@ -1,5 +1,5 @@
 import { MethodInterceptor } from './method-interceptor';
-import { MultiAction } from './multi-action';
+import { createMultiAction } from './multi-action-utils';
 
 interface ActionManager {
   add(action: any): void;
@@ -49,15 +49,15 @@ export class TransactionManager {
 
   commitTransaction(description?: string) {
     const actions = this.closeTransaction();
-    if (!MultiAction) {
+    const multiAction = createMultiAction(actions);
+    if (!multiAction) {
       actions.forEach((action) => this._interceptor.invokeOriginal(action));
       return;
     }
 
-    const action = new MultiAction(actions);
     if (description)
-      (action as any)._description = description;
+      (multiAction as any)._description = description;
 
-    this._interceptor.invokeOriginal(action);
+    this._interceptor.invokeOriginal(multiAction);
   }
 }
