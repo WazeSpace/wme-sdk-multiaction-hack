@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es2017",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "paths": {
+      "react": [
+        "./node_modules/@types/react"
+      ],
+      "@/*": ["*"]
+    },
+    "lib": [
+      "dom",
+      "es2019",
+      "es2022",
+      "es2023",
+      "esnext.disposable"
+    ],
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
