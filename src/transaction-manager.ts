@@ -9,12 +9,13 @@ interface ActionManager {
 
 export class TransactionManager {
   private _interceptor: MethodInterceptor<ActionManager, 'add'>;
-  private _actionsInTransaction: any[] = [];
+  private _actionsInTransaction: Action[] = [];
+  private _undoableActionsInTransaction: Action[] = [];
   private _hasActiveTransaction = false;
 
-  constructor(actionManager: ActionManager) {
+  constructor(private readonly _actionManager: ActionManager) {
     this._interceptor = new MethodInterceptor(
-      actionManager,
+      _actionManager,
       'add',
       (triggerOriginal, action) => {
         if (!this.isTransactionOpen)
@@ -39,7 +40,8 @@ export class TransactionManager {
               return result;
             },
           ).enable();
-          action.doAction(actionManager.dataModel);
+          action.doAction(_actionManager.dataModel);
+          this._undoableActionsInTransaction.push(action);
         }
         this._actionsInTransaction.push(action);
         return true;
@@ -55,6 +57,7 @@ export class TransactionManager {
 
   private openTransaction() {
     this._actionsInTransaction = [];
+    this._undoableActionsInTransaction = [];
     this._hasActiveTransaction = true;
   }
 
@@ -82,5 +85,12 @@ export class TransactionManager {
       (multiAction as any)._description = description;
 
     this._interceptor.invokeOriginal(multiAction);
+  }
+
+  cancelTransaction() {
+    this._undoableActionsInTransaction.forEach(
+      (action) => action.undoAction(this._actionManager.dataModel)
+    );
+    this.closeTransaction();
   }
 }

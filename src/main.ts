@@ -12,12 +12,15 @@ window.SDK_INITIALIZED.then(() => {
 export default {
   beginTransaction: () => transactionManager.beginTransaction(),
   commitTransaction: (description?: string) => transactionManager.commitTransaction(description),
+  cancelTransaction: () => transactionManager.cancelTransaction(),
   groupActions(cb: () => void, description?: string) {
     transactionManager.beginTransaction();
     try {
       cb();
-    } finally {
       transactionManager.commitTransaction(description);
+    } catch (e) {
+      transactionManager.cancelTransaction();
+      throw e;
     }
   },
 }
