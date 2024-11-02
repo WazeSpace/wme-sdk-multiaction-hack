@@ -19,7 +19,7 @@ export class TransactionManager {
           return triggerOriginal(action);
 
         this._actionsInTransaction.push(action);
-        return null;
+        return true;
       },
     );
     this._interceptor.enable();
