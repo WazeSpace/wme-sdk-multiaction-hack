@@ -10,7 +10,7 @@ export class Action<P = any> {
   getID(): number;
   isLeaf(): boolean;
   accept(dataModel: any): void;
-  doAction(dataModel: any): void;
+  doAction(dataModel: any): boolean;
   undoSupported(): boolean;
   undoAction(dataModel: any): void;
   redoAction(dataModel: any): void;
