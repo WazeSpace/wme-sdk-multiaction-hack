@@ -18,7 +18,6 @@ export class MethodInterceptor<
     private readonly _target: O,
     private readonly _methodName: FN,
     private readonly _interceptor: (
-      this: typeof this._target, 
       callOriginal: FO[FN],
       ...args: Parameters<FO[FN]>
     ) => ReturnType<FO[FN]>,
