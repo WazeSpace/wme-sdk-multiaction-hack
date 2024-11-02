@@ -1,8 +1,10 @@
+import { Action } from './action';
 import { MethodInterceptor } from './method-interceptor';
 import { createMultiAction } from './multi-action-utils';
 
 interface ActionManager {
-  add(action: any): void;
+  dataModel: any;
+  add(action: Action): boolean;
 }
 
 export class TransactionManager {
@@ -18,6 +20,27 @@ export class TransactionManager {
         if (!this.isTransactionOpen)
           return triggerOriginal(action);
 
+        if (action.undoSupported()) {
+          let isActionPerformed = false;
+          new MethodInterceptor(
+            action,
+            'doAction',
+            (callOrig, ...args) => {
+              if (isActionPerformed) return true;
+              return (isActionPerformed = callOrig(...args));
+            },
+          ).enable();
+          new MethodInterceptor(
+            action,
+            'undoAction',
+            (callOrig, ...args) => {
+              const result = callOrig(...args);
+              isActionPerformed = false;
+              return result;
+            },
+          ).enable();
+          action.doAction(actionManager.dataModel);
+        }
         this._actionsInTransaction.push(action);
         return true;
       },
