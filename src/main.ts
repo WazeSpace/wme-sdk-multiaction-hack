@@ -14,7 +14,10 @@ export default {
   commitTransaction: (description?: string) => transactionManager.commitTransaction(description),
   groupActions(cb: () => void, description?: string) {
     transactionManager.beginTransaction();
-    cb();
-    transactionManager.commitTransaction(description);
+    try {
+      cb();
+    } finally {
+      transactionManager.commitTransaction(description);
+    }
   },
 }
