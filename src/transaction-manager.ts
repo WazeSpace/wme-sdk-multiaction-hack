@@ -23,12 +23,14 @@ export class TransactionManager {
 
         if (action.undoSupported()) {
           let isActionPerformed = false;
+          let actionResult = undefined;
           new MethodInterceptor(
             action,
             'doAction',
             (callOrig, ...args) => {
-              if (isActionPerformed) return true;
-              return (isActionPerformed = callOrig(...args));
+              if (isActionPerformed) return actionResult;
+              isActionPerformed = true;
+              return (actionResult = callOrig(...args));
             },
           ).enable();
           new MethodInterceptor(
@@ -37,6 +39,7 @@ export class TransactionManager {
             (callOrig, ...args) => {
               const result = callOrig(...args);
               isActionPerformed = false;
+              actionResult = undefined;
               return result;
             },
           ).enable();
